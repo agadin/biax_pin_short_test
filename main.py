@@ -4,18 +4,18 @@
 # make the relay controlable via a streamlit web page and display current tension on the streamlit page
 import time
 import streamlit as st
-from screen_decode import capture_and_decode
+from screen_decode import capture_and_decode, highlight_next_button
 import pandas as pd
 from datetime import datetime
 import numpy as np
 import cv2
 import mss
 import serial
+import pyautogui
 
 # Initialize serial connection to Arduino
-arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
-
 def write_read(x):
+    arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
     arduino.write(bytes(x, 'utf-8'))
     time.sleep(0.05)
     data = arduino.readline()
@@ -47,22 +47,27 @@ with st.expander("Capture Zone Settings"):
     width = st.number_input('Width', value=300)
     height = st.number_input('Height', value=200)
 
+# Dropdown for selecting outcome
+outcome = st.selectbox('Select Outcome', ['Fire Relay', 'Click Next Button'])
+
 # Relay control
-if st.button('Turn Relay On'):
-    write_read('ON')
-    st.write('Relay is turned on')
-    tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
-    record_event(test_name, tension)
-    time.sleep(0.5)  # Wait for half a second
-    write_read('OFF')
-    st.write('Relay is turned off')
-    tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
-    record_event(test_name, tension)
+if outcome == 'Fire Relay':
+    if st.button('Turn Relay On'):
+        write_read('ON')
+        st.write('Relay is turned on')
+        tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
+        record_event(test_name, tension)
+        time.sleep(0.5)  # Wait for half a second
+        write_read('OFF')
+        st.write('Relay is turned off')
+        tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
+        record_event(test_name, tension)
 
 # Placeholder for current tension, image, and line chart
 tension_placeholder = st.empty()
 chart_placeholder = st.empty()
 image_placeholder = st.empty()
+next_button_place = st.empty()
 
 # List to store tension values for plotting
 tension_values = []
@@ -86,10 +91,21 @@ while True:
     # Display the tension values as a line chart
     chart_placeholder.line_chart(tension_values)
 
+    highlighted_img = highlight_next_button()
+    next_button_place.image(highlighted_img, caption='Current Location of Next Button', use_column_width=True)
+
     # Check if tension exceeds threshold and fire at threshold is enabled
     if fire_at_threshold and float(tension) > threshold_value:
-        write_read('ON')
-        st.write('Relay is turned on due to threshold')
-        record_event(test_name, tension)
+        if outcome == 'Fire Relay':
+            write_read('ON')
+            st.write('Relay is turned on due to threshold')
+            record_event(test_name, tension)
+        elif outcome == 'Click Next Button':
+            button_location = pyautogui.locateOnScreen('next_button.png')
+            if button_location:
+                pyautogui.click(button_location)
+                st.write('Next button clicked due to threshold')
+                record_event(test_name, tension)
+
 
     time.sleep(1)  # Update every second
