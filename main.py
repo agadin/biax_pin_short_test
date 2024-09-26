@@ -4,7 +4,7 @@
 # make the relay controlable via a streamlit web page and display current tension on the streamlit page
 import time
 import streamlit as st
-from screen_decode import capture_and_decode, highlight_next_button
+from screen_decode import capture_and_decode
 import pandas as pd
 from datetime import datetime
 import numpy as np
@@ -27,6 +27,13 @@ def record_event(test_name, tension):
     df = pd.DataFrame([[timestamp, tension, test_name]], columns=['Time', 'Tension', 'Test Name'])
     df.to_csv('event_history.csv', mode='a', header=False, index=False)
 
+# Function to highlight the button based on user-supplied coordinates
+def highlight_button(img, top, left, width, height):
+    top_left = (left, top)
+    bottom_right = (left + width, top + height)
+    cv2.rectangle(img, top_left, bottom_right, (255, 0, 0), 2)
+    return img
+
 # Streamlit web page
 st.title('Relay Control and Tension Display')
 
@@ -42,10 +49,17 @@ threshold_value = st.number_input('Threshold Value', value=0)
 
 # Input for capture zone
 with st.expander("Capture Zone Settings"):
-    top = st.number_input('Top', value=100)
-    left = st.number_input('Left', value=100)
-    width = st.number_input('Width', value=300)
-    height = st.number_input('Height', value=200)
+    capture_top = st.number_input('Capture Top', value=100)
+    capture_left = st.number_input('Capture Left', value=100)
+    capture_width = st.number_input('Capture Width', value=300)
+    capture_height = st.number_input('Capture Height', value=200)
+
+# Add input fields for user-supplied coordinates
+with st.expander("Button Coordinates"):
+    button_top = st.number_input('Button Top', value=100)
+    button_left = st.number_input('Button Left', value=100)
+    button_width = st.number_input('Button Width', value=50)
+    button_height = st.number_input('Button Height', value=30)
 
 # Dropdown for selecting outcome
 outcome = st.selectbox('Select Outcome', ['Fire Relay', 'Click Next Button'])
@@ -55,12 +69,12 @@ if outcome == 'Fire Relay':
     if st.button('Turn Relay On'):
         write_read('ON')
         st.write('Relay is turned on')
-        tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
+        tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
         time.sleep(0.5)  # Wait for half a second
         write_read('OFF')
         st.write('Relay is turned off')
-        tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
+        tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
 
 # Placeholder for current tension, image, and line chart
@@ -81,7 +95,7 @@ if st.button('Show Event History'):
 
 # Continuously update tension
 while True:
-    tension, img = capture_and_decode({"top": top, "left": left, "width": width, "height": height})
+    tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
     tension_placeholder.text(f'Current Tension: {tension}')
     image_placeholder.image(img, caption='Captured Region', use_column_width=True)
 
@@ -91,7 +105,8 @@ while True:
     # Display the tension values as a line chart
     chart_placeholder.line_chart(tension_values)
 
-    highlighted_img = highlight_next_button()
+    # Highlight the button based on user-supplied coordinates
+    highlighted_img = highlight_button(img, button_top, button_left, button_width, button_height)
     next_button_place.image(highlighted_img, caption='Current Location of Next Button', use_column_width=True)
 
     # Check if tension exceeds threshold and fire at threshold is enabled
@@ -101,11 +116,8 @@ while True:
             st.write('Relay is turned on due to threshold')
             record_event(test_name, tension)
         elif outcome == 'Click Next Button':
-            button_location = pyautogui.locateOnScreen('next_button.png')
-            if button_location:
-                pyautogui.click(button_location)
-                st.write('Next button clicked due to threshold')
-                record_event(test_name, tension)
-
+            pyautogui.click(button_left + button_width // 2, button_top + button_height // 2)
+            st.write('Next button clicked due to threshold')
+            record_event(test_name, tension)
 
     time.sleep(1)  # Update every second
