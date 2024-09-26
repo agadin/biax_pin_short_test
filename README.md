@@ -91,6 +91,13 @@ streamlit run main.py
 
 > [!NOTE]
 > `crtl + c` can be used to stop the streamlit application in the terminal
+
+## Test Codes
+The test codes are located in the `test` directory. The test codes are used to test the functionality of the code. The test codes are as follows:
+* `ardino_tester.py`: This code tests the functionality of the Arduino relay. The code triggers the relay for 1 second and then stops the relay for 1 second. The code repeats this process 10 times.
+* `button_finder_test.py`: This code tests the functionality of the screen click. The code finds the location of the button on the screen and then clicks the button. The code repeats this process 10 times.
+* `click_tester.py`: This code tests the functionality of the screen click. The code clicks the location of the button on the screen. The code repeats this process 10 times.
+
 # Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 * @agadin on github
