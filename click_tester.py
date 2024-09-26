@@ -16,6 +16,11 @@ def perform_click(button_top, button_left, button_width, button_height):
         if not click_event.is_set():
             break
 
+# Function to start the click thread
+def start_click_thread(button_top, button_left, button_width, button_height):
+    click_event.set()
+    threading.Thread(target=perform_click, args=(button_top, button_left, button_width, button_height)).start()
+
 # Streamlit web page
 st.title('Automated Screen Clicker')
 
@@ -31,8 +36,7 @@ with st.expander("Button Coordinates"):
 
 # Button to start the test
 if st.button('Start Test'):
-    click_event.set()
-    threading.Thread(target=perform_click, args=(button_top, button_left, button_width, button_height)).start()
+    start_click_thread(button_top, button_left, button_width, button_height)
 
 # Button to stop the test
 if st.button('Stop Test'):
