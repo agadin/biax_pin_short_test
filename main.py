@@ -70,7 +70,7 @@ if outcome == 'Fire Relay':
 
 
     if st.button('Turn Relay On'):
-        # fire_message.write('Relay is turned on')
+        # fire_message.write('Relay is turned on'
         trigger_relay(delay_input)
         tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
