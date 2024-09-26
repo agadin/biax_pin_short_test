@@ -5,6 +5,10 @@ import numpy as np
 import re
 import pyautogui
 
+import re
+
+import re
+
 def capture_and_decode(monitor):
     with mss.mss() as sct:
         print(f"Capturing screen region: {monitor}")
@@ -17,8 +21,9 @@ def capture_and_decode(monitor):
         text = pytesseract.image_to_string(gray, config='--psm 6')
         print(f"Extracted text: {text}")
 
-        number = re.findall(r'\d+\.?\d*', text)
-        number = ''.join(number) if number else '0'
+        # Extract only the numeric part
+        match = re.search(r'\d+\.\d+', text)
+        number = match.group(0) if match else '0'
         print(f"Extracted number: {number}")
 
         return number.strip(), img
