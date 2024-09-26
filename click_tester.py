@@ -1,32 +1,20 @@
-import streamlit as st
+import argparse
 import subprocess
 
-# Streamlit web page
-st.title('Automated Screen Clicker')
+def main():
+    parser = argparse.ArgumentParser(description='Automated Screen Clicker')
+    parser.add_argument('--button_top', type=int, default=347, help='Button Top coordinate')
+    parser.add_argument('--button_left', type=int, default=1538, help='Button Left coordinate')
+    parser.add_argument('--button_width', type=int, default=50, help='Button Width')
+    parser.add_argument('--button_height', type=int, default=50, help='Button Height')
+    args = parser.parse_args()
 
-# Dropdown for selecting outcome
-outcome = st.selectbox('Select Outcome', ['Click Next Button'])
+    click_process = subprocess.Popen([
+        'python', 'click_process.py', str(args.button_top), str(args.button_left), str(args.button_width), str(args.button_height)
+    ])
 
-# Add input fields for user-supplied coordinates
-with st.expander("Button Coordinates"):
-    button_top = st.number_input('Button Top', value=347)
-    button_left = st.number_input('Button Left', value=1538)
-    button_width = st.number_input('Button Width', value=50)
-    button_height = st.number_input('Button Height', value=50)
+    input("Press Enter to stop the clicking process...")
+    click_process.terminate()
 
-# Initialize session state for the click process
-if 'click_process' not in st.session_state:
-    st.session_state['click_process'] = None
-
-# Button to start the test
-if st.button('Start Test'):
-    if st.session_state['click_process'] is None or st.session_state['click_process'].poll() is not None:
-        st.session_state['click_process'] = subprocess.Popen([
-            'python', 'click_process.py', str(button_top), str(button_left), str(button_width), str(button_height)
-        ])
-
-# Button to stop the test
-if st.button('Stop Test'):
-    if st.session_state['click_process'] is not None:
-        st.session_state['click_process'].terminate()
-        st.session_state['click_process'] = None
+if __name__ == "__main__":
+    main()
