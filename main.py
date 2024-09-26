@@ -35,7 +35,7 @@ default_test_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 test_name = st.text_input('Test Name', value=default_test_name)
 
 # Toggle for Fire at Threshold
-fire_at_threshold = st.checkbox('Fire at Threshold')
+fire_at_threshold = st.toggle('Fire at Threshold')
 
 # Input for threshold value
 threshold_value = st.number_input('Threshold Value', value=0.0, format="%.2f")
