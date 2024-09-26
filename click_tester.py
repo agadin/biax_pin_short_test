@@ -1,25 +1,5 @@
 import streamlit as st
-import pyautogui
-import time
-import threading
-
-# Event to control the clicking process
-click_event = threading.Event()
-
-# Function to perform the click action
-def perform_click(button_top, button_left, button_width, button_height):
-    click_count = 0
-    while click_event.is_set() and click_count < 10:
-        pyautogui.click(button_left + button_width // 2, button_top + button_height // 2)
-        time.sleep(1)
-        click_count += 1
-        if not click_event.is_set():
-            break
-
-# Function to start the click thread
-def start_click_thread(button_top, button_left, button_width, button_height):
-    click_event.set()
-    threading.Thread(target=perform_click, args=(button_top, button_left, button_width, button_height)).start()
+import subprocess
 
 # Streamlit web page
 st.title('Automated Screen Clicker')
@@ -34,10 +14,19 @@ with st.expander("Button Coordinates"):
     button_width = st.number_input('Button Width', value=50)
     button_height = st.number_input('Button Height', value=50)
 
+# Initialize session state for the click process
+if 'click_process' not in st.session_state:
+    st.session_state['click_process'] = None
+
 # Button to start the test
 if st.button('Start Test'):
-    start_click_thread(button_top, button_left, button_width, button_height)
+    if st.session_state['click_process'] is None or st.session_state['click_process'].poll() is not None:
+        st.session_state['click_process'] = subprocess.Popen([
+            'python', 'click_process.py', str(button_top), str(button_left), str(button_width), str(button_height)
+        ])
 
 # Button to stop the test
 if st.button('Stop Test'):
-    click_event.clear()
+    if st.session_state['click_process'] is not None:
+        st.session_state['click_process'].terminate()
+        st.session_state['click_process'] = None
