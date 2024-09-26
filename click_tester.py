@@ -3,6 +3,9 @@ import pyautogui
 import time
 import threading
 
+if 'clicking' not in st.session_state:
+    st.session_state['clicking'] = False
+
 # Function to perform the click action
 def perform_click(button_top, button_left, button_width, button_height):
     while st.session_state['clicking']:
