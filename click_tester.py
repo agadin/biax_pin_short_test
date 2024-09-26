@@ -3,14 +3,18 @@ import pyautogui
 import time
 import threading
 
-if 'clicking' not in st.session_state:
-    st.session_state['clicking'] = False
+# Event to control the clicking process
+click_event = threading.Event()
 
 # Function to perform the click action
 def perform_click(button_top, button_left, button_width, button_height):
-    while st.session_state['clicking']:
+    click_count = 0
+    while click_event.is_set() and click_count < 10:
         pyautogui.click(button_left + button_width // 2, button_top + button_height // 2)
         time.sleep(1)
+        click_count += 1
+        if not click_event.is_set():
+            break
 
 # Streamlit web page
 st.title('Automated Screen Clicker')
@@ -25,15 +29,11 @@ with st.expander("Button Coordinates"):
     button_width = st.number_input('Button Width', value=50)
     button_height = st.number_input('Button Height', value=50)
 
-# Initialize session state for clicking
-if 'clicking' not in st.session_state:
-    st.session_state['clicking'] = False
-
 # Button to start the test
 if st.button('Start Test'):
-    st.session_state['clicking'] = True
+    click_event.set()
     threading.Thread(target=perform_click, args=(button_top, button_left, button_width, button_height)).start()
 
 # Button to stop the test
 if st.button('Stop Test'):
-    st.session_state['clicking'] = False
+    click_event.clear()
