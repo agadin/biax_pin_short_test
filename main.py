@@ -38,7 +38,7 @@ test_name = st.text_input('Test Name', value=default_test_name)
 fire_at_threshold = st.checkbox('Fire at Threshold')
 
 # Input for threshold value
-threshold_value = st.number_input('Threshold Value', value=0)
+threshold_value = st.number_input('Threshold Value', value=0, format="%.2f")
 
 # Input for capture zone
 with st.expander("Capture Zone Settings"):
@@ -49,10 +49,10 @@ with st.expander("Capture Zone Settings"):
 
 # Add input fields for user-supplied coordinates
 with st.expander("Button Coordinates"):
-    button_top = st.number_input('Button Top', value=100)
-    button_left = st.number_input('Button Left', value=100)
+    button_top = st.number_input('Button Top', value=347)
+    button_left = st.number_input('Button Left', value=1538)
     button_width = st.number_input('Button Width', value=50)
-    button_height = st.number_input('Button Height', value=30)
+    button_height = st.number_input('Button Height', value=50)
 
 # Dropdown for selecting outcome
 outcome = st.selectbox('Select Outcome', ['Fire Relay', 'Click Next Button'])
