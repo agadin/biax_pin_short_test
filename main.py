@@ -63,12 +63,12 @@ if outcome == 'Fire Relay':
     delay_input = st.number_input('Relay Delay', value=0.5)
     if st.button('Turn Relay On'):
         write_read('ON')
-        fire_message.write('Relay is turned on')
+        # fire_message.write('Relay is turned on')
         tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
         time.sleep(delay_input)  # Wait for half a second
         write_read('OFF')
-        fire_message.write('Relay is turned off')
+        # fire_message.write('Relay is turned off')
         tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
 
