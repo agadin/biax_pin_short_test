@@ -35,10 +35,10 @@ default_test_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 test_name = st.text_input('Test Name', value=default_test_name)
 
 # Toggle for Fire at Threshold
-fire_at_threshold = st.toggle('Fire at Threshold')
+fire_at_threshold = st.toggle('Fire at Threshold', value=True)
 
 # Input for threshold value
-threshold_value = st.number_input('Threshold Value', value=0.27, format="%.2f")
+threshold_value = st.number_input('Threshold Value', value=0.30, format="%.2f")
 # Input for capture zone
 with st.expander("Capture Zone Settings"):
     capture_top = st.number_input('Capture Top', value=390)
@@ -61,12 +61,13 @@ if outcome == 'Fire Relay':
     fire_message = st.empty()
     delay_input = st.number_input('Relay Delay', value=0.5)
     def trigger_relay(delay_input):
+        write_read('ON')
         # fire_message.write('Relay is turned on')
+        time.sleep(delay_input)  # Wait for the specified delay
+        write_read('OFF')
         tension, img = capture_and_decode(
             {"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
-        time.sleep(delay_input)  # Wait for the specified delay
-        write_read('OFF')
 
 
     if st.button('Turn Relay On'):
@@ -95,7 +96,8 @@ if st.button('Show Event History'):
 
 
 # Continuously update tension
-while True:
+temp_loop= True
+while temp_loop:
     tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
     tension_placeholder.text(f'Current Tension: {tension}')
     image_placeholder.image(img, caption='Captured Region', use_column_width=True)
@@ -114,7 +116,11 @@ while True:
     # Check if tension exceeds threshold and fire at threshold is enabled
     if fire_at_threshold and float(tension) > threshold_value:
         if outcome == 'Fire Relay':
-            trigger_relay(delay_input)
+            write_read('ON')
+            # fire_message.write('Relay is turned on')
+            time.sleep(delay_input)  # Wait for the specified delay
+            write_read('OFF')
+            time.sleep(10) 
             record_event(test_name, tension)
 
         elif outcome == 'Click Next Button':
