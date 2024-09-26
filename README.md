@@ -9,7 +9,7 @@ A streamlit application to automatically decode numbers from a windowed gui (ie 
 * [Acknowledgements](#acknowledgements)
 
 # Introduction
-`streamlit-arduino-relay` is a streamlit application to automatically decode numbers from a windowed gui (ie machine output readout) and trigger an Arduino relay or a screen click when a specific threshold value has been reached.
+`streamlit-arduino-relay` is a streamlit application to automatically decode numbers from a windowed gui (ie machine output readout) and trigger an Arduino relay or a screen click when a specific threshold value has been reached. This repository has an example use case for that digitally triggers a Newton by testtronics (referred to as biax in this README) by grounding pin 13 of the M port. 
 
 ## Decoding GUI Numbers
 The main application (`main.py`) first reads a select region of the screen. The user defines this region (labeled `Captured Region` in the streamlit application) by indicating the top left corner cordinates and the height and width of the box they would like to capture. A preview of this region can be seen in the streamlit web application. From the region, a using `pytesseract` the text is extracted from the image. The extracted text is then converted to a number and compared to a threshold value. The regex pattern used to parse only the numbers will remove all non-number characters while keeping the deimal point. The extracted number is shown on the web applicaiton as `Current Tension:` and is a float value. A temporal history of the read value is shown in the chart in the application.
