@@ -1,23 +1,16 @@
-import argparse
+import pyautogui
 import time
-from pywinauto.application import Application
 
-def main():
-    parser = argparse.ArgumentParser(description='Automated Screen Clicker')
-    parser.add_argument('--button_top', type=int, default=347, help='Button Top coordinate')
-    parser.add_argument('--button_left', type=int, default=1538, help='Button Left coordinate')
-    parser.add_argument('--button_width', type=int, default=50, help='Button Width')
-    parser.add_argument('--button_height', type=int, default=50, help='Button Height')
-    parser.add_argument('--repeat', type=int, default=2, help='Number of times to repeat the clicking process')
-    args = parser.parse_args()
+# Coordinates of the window to click
+window_x = 100  # Replace with your window's X coordinate
+window_y = 200  # Replace with your window's Y coordinate
 
-    # Connect to the window named "Newton"
-    app = Application(backend="uia").connect(title='Newton')
-    dlg = app.window(title='Newton')
+# Number of clicks
+click_count = 10
 
-    for _ in range(args.repeat):
-        dlg.click_input(coords=(args.button_left + args.button_width // 2, args.button_top + args.button_height // 2))
-        time.sleep(1)  # Wait for 1 second between clicks
+# Delay between clicks in seconds
+delay = 1
 
-if __name__ == "__main__":
-    main()
+for _ in range(click_count):
+    pyautogui.click(window_x, window_y)
+    time.sleep(delay)
