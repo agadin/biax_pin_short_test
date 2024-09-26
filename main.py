@@ -42,10 +42,10 @@ threshold_value = st.number_input('Threshold Value', value=0)
 
 # Input for capture zone
 with st.expander("Capture Zone Settings"):
-    capture_top = st.number_input('Capture Top', value=100)
-    capture_left = st.number_input('Capture Left', value=100)
-    capture_width = st.number_input('Capture Width', value=300)
-    capture_height = st.number_input('Capture Height', value=200)
+    capture_top = st.number_input('Capture Top', value=390)
+    capture_left = st.number_input('Capture Left', value=590)
+    capture_width = st.number_input('Capture Width', value=150)
+    capture_height = st.number_input('Capture Height', value=25)
 
 # Add input fields for user-supplied coordinates
 with st.expander("Button Coordinates"):

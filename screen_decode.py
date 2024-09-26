@@ -17,7 +17,7 @@ def capture_and_decode(monitor):
         text = pytesseract.image_to_string(gray, config='--psm 6')
         print(f"Extracted text: {text}")
 
-        number = re.findall(r'\d+', text)
+        number = re.findall(r'\d+\.?\d*', text)
         number = ''.join(number) if number else '0'
         print(f"Extracted number: {number}")
 
