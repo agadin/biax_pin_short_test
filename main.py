@@ -27,13 +27,6 @@ def record_event(test_name, tension):
     df = pd.DataFrame([[timestamp, tension, test_name]], columns=['Time', 'Tension', 'Test Name'])
     df.to_csv('event_history.csv', mode='a', header=False, index=False)
 
-# Function to highlight the button based on user-supplied coordinates
-def highlight_button(img, top, left, width, height):
-    top_left = (left, top)
-    bottom_right = (left + width, top + height)
-    cv2.rectangle(img, top_left, bottom_right, (255, 0, 0), 2)
-    return img
-
 # Streamlit web page
 st.title('Relay Control and Tension Display')
 
@@ -66,14 +59,16 @@ outcome = st.selectbox('Select Outcome', ['Fire Relay', 'Click Next Button'])
 
 # Relay control
 if outcome == 'Fire Relay':
+    fire_message = st.empty()
+    delay_input = st.number_input('Relay Delay', value=0.5)
     if st.button('Turn Relay On'):
         write_read('ON')
-        st.write('Relay is turned on')
+        fire_message.write('Relay is turned on')
         tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
-        time.sleep(0.5)  # Wait for half a second
+        time.sleep(delay_input)  # Wait for half a second
         write_read('OFF')
-        st.write('Relay is turned off')
+        fire_message.write('Relay is turned off')
         tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
         record_event(test_name, tension)
 
@@ -93,6 +88,7 @@ if st.button('Show Event History'):
     except FileNotFoundError:
         st.write('No event history found.')
 
+
 # Continuously update tension
 while True:
     tension, img = capture_and_decode({"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
@@ -104,10 +100,11 @@ while True:
 
     # Display the tension values as a line chart
     chart_placeholder.line_chart(tension_values)
+    if outcome == 'Click Next Button':
+        tension_hold, cropped_img = capture_and_decode({"top": button_top, "left": button_left, "width": button_width, "height": button_height})
+    # Ensure cropping coordinates are within the image bound
+        next_button_place.image(cropped_img, caption='Current Location of Next Button', use_column_width=True)
 
-    # Highlight the button based on user-supplied coordinates
-    highlighted_img = highlight_button(img, button_top, button_left, button_width, button_height)
-    next_button_place.image(highlighted_img, caption='Current Location of Next Button', use_column_width=True)
 
     # Check if tension exceeds threshold and fire at threshold is enabled
     if fire_at_threshold and float(tension) > threshold_value:
