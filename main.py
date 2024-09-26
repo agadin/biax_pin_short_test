@@ -38,8 +38,7 @@ test_name = st.text_input('Test Name', value=default_test_name)
 fire_at_threshold = st.checkbox('Fire at Threshold')
 
 # Input for threshold value
-threshold_value = st.number_input('Threshold Value', value=0, format="%.2f")
-
+threshold_value = st.number_input('Threshold Value', value=0.0, format="%.2f")
 # Input for capture zone
 with st.expander("Capture Zone Settings"):
     capture_top = st.number_input('Capture Top', value=390)
