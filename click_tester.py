@@ -1,6 +1,6 @@
 import argparse
 import subprocess
-# python click_tester_cli.py --button_top 347 --button_left 1538 --button_width 50 --button_height 50
+# python click_tester.py --button_top 347 --button_left 1538 --button_width 50 --button_height 50
 def main():
     parser = argparse.ArgumentParser(description='Automated Screen Clicker')
     parser.add_argument('--button_top', type=int, default=347, help='Button Top coordinate')
