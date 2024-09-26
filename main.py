@@ -38,13 +38,13 @@ test_name = st.text_input('Test Name', value=default_test_name)
 fire_at_threshold = st.toggle('Fire at Threshold')
 
 # Input for threshold value
-threshold_value = st.number_input('Threshold Value', value=0.0, format="%.2f")
+threshold_value = st.number_input('Threshold Value', value=0.27, format="%.2f")
 # Input for capture zone
 with st.expander("Capture Zone Settings"):
     capture_top = st.number_input('Capture Top', value=390)
     capture_left = st.number_input('Capture Left', value=590)
     capture_width = st.number_input('Capture Width', value=150)
-    capture_height = st.number_input('Capture Height', value=25)
+    capture_height = st.number_input('Capture Height', value=30)
 
 # Add input fields for user-supplied coordinates
 with st.expander("Button Coordinates"):
@@ -60,6 +60,15 @@ outcome = st.selectbox('Select Outcome', ['Fire Relay', 'Click Next Button'])
 if outcome == 'Fire Relay':
     fire_message = st.empty()
     delay_input = st.number_input('Relay Delay', value=0.5)
+    def trigger_relay(delay_input):
+        # fire_message.write('Relay is turned on')
+        tension, img = capture_and_decode(
+            {"top": capture_top, "left": capture_left, "width": capture_width, "height": capture_height})
+        record_event(test_name, tension)
+        time.sleep(delay_input)  # Wait for the specified delay
+        write_read('OFF')
+
+    trigger_relay(delay_input)
     if st.button('Turn Relay On'):
         write_read('ON')
         # fire_message.write('Relay is turned on')
@@ -79,6 +88,8 @@ next_button_place = st.empty()
 
 # List to store tension values for plotting
 tension_values = []
+
+
 
 if st.button('Show Event History'):
     try:
@@ -108,12 +119,12 @@ while True:
     # Check if tension exceeds threshold and fire at threshold is enabled
     if fire_at_threshold and float(tension) > threshold_value:
         if outcome == 'Fire Relay':
-            write_read('ON')
-            st.write('Relay is turned on due to threshold')
+            trigger_relay(delay_input)
             record_event(test_name, tension)
+
         elif outcome == 'Click Next Button':
             pyautogui.click(button_left + button_width // 2, button_top + button_height // 2)
             st.write('Next button clicked due to threshold')
             record_event(test_name, tension)
 
-    time.sleep(1)  # Update every second
+    time.sleep(0.5)  # Update every half seond
