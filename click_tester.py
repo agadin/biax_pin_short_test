@@ -1,6 +1,7 @@
 import argparse
-import subprocess
- # python click_tester.py --button_top 347 --button_left 1538 --button_width 50 --button_height 50 --repeat 10
+import time
+from pywinauto.application import Application
+
 def main():
     parser = argparse.ArgumentParser(description='Automated Screen Clicker')
     parser.add_argument('--button_top', type=int, default=347, help='Button Top coordinate')
@@ -10,13 +11,13 @@ def main():
     parser.add_argument('--repeat', type=int, default=2, help='Number of times to repeat the clicking process')
     args = parser.parse_args()
 
-    for _ in range(args.repeat):
-        click_process = subprocess.Popen([
-            'python', 'click_process.py', str(args.button_top), str(args.button_left), str(args.button_width), str(args.button_height)
-        ])
+    # Connect to the window named "Newton"
+    app = Application(backend="uia").connect(title='Newton')
+    dlg = app.window(title='Newton')
 
-        input("Press Enter to stop the clicking process...")
-        click_process.terminate()
+    for _ in range(args.repeat):
+        dlg.click_input(coords=(args.button_left + args.button_width // 2, args.button_top + args.button_height // 2))
+        time.sleep(1)  # Wait for 1 second between clicks
 
 if __name__ == "__main__":
     main()
